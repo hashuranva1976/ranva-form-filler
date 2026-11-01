@@ -353,19 +353,34 @@ def fill_form():
             pass
 
     browser_choice = data.get("browser", "chrome")
+    is_cloud = os.environ.get("IS_CLOUD_DEPLOY") == "true" or sys.platform != "win32"
+
+    def do_fill():
+        engine = FormFillerEngine(headless=False, browser_channel=browser_choice)
+        try:
+            engine.start()
+            if not is_cloud:
+                active_engines[profile_id] = engine
+
+            res = engine.fill(url, profile, log_cb=log_tracker)
+            if not is_cloud:
+                engine.bring_to_front_window()
+            else:
+                engine.close()
+            return res
+        except Exception:
+            try:
+                engine.close()
+            except Exception:
+                pass
+            raise
 
     try:
-        # Launch real browser (Edge or Chrome) with UI visible to user
-        engine = FormFillerEngine(headless=False, browser_channel=browser_choice)
-        engine.start()
-        # Keep engine in global dictionary so Python never closes it!
-        active_engines[profile_id] = engine
+        import concurrent.futures
+        # Execute in a dedicated clean worker thread to completely prevent "Playwright Sync API inside asyncio loop"
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            res = executor.submit(do_fill).result()
 
-        res = engine.fill(url, profile, log_cb=log_tracker)
-        # Bring to front again after fill completes
-        engine.bring_to_front_window()
-
-        # Note: We keep the browser open permanently so user can review/submit manually!
         return jsonify({
             "success": True,
             "filled_count": res.get("filled_count", 0),
@@ -377,8 +392,6 @@ def fill_form():
     except Exception as e:
         if profile_id in active_engines:
             del active_engines[profile_id]
-        if engine:
-            engine.close()
         return jsonify({"success": False, "error": str(e), "logs": logs}), 500
 
 if __name__ == "__main__":
