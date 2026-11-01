@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+chrome_profile/
+chrome_profile_fb/
+edge_profile/
+edge_profile_fb/
+static/screenshots/*.png
+.env

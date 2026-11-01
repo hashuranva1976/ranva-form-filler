@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ai-universal-form-filler
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: singapore
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: IS_CLOUD_DEPLOY
+        value: "true"
