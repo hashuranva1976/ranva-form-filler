@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Online Form Auto-Filler | સ્માર્ટ ઓનલાઇન ફોર્મ ફિલર</title>
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --bg-light: #f8fafc;
+            --card-border: #e2e8f0;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: #1e293b;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15);
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
+        }
+        .card-custom {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px -3px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-custom:hover {
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+        }
+        .candidate-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .console-box {
+            background-color: #090d16;
+            color: #38bdf8;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 16px;
+            border-radius: 10px;
+            height: 280px;
+            overflow-y: auto;
+            font-size: 0.88rem;
+            border: 1px solid #1e293b;
+        }
+        .console-line {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        .btn-fill {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-weight: 700;
+            padding: 14px 28px;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+            transition: all 0.2s;
+        }
+        .btn-fill:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+        }
+        .avatar-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+        .nav-tabs .nav-link {
+            font-weight: 600;
+            color: #64748b;
+            border: none;
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark sticky-top px-4 py-3">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-2 rounded-3 fs-5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 text-white fw-bold">AI Universal Form Auto-Filler</h5>
+                    <small class="text-light opacity-75">કોઈપણ ઓનલાઇન ફોર્મ ૧-ક્લિકમાં ઓટોમેટિક ભરો</small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/demo-form" target="_blank" class="btn btn-outline-light btn-sm px-3 rounded-pill">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> ટેસ્ટ ફોર્મ પોર્ટલ જુઓ
+                </a>
+                <button onclick="openNewProfileModal()" class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold">
+                    <i class="bi bi-person-plus-fill me-1"></i> નવું ઉમેદવાર ઉમેરો
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+
+        <!-- HERO HEADER -->
+        <div class="hero-banner d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <span class="badge bg-white text-primary mb-2 px-3 py-1 rounded-pill fw-bold">૧૦૦% સ્માર્ટ ઓટોમેશન</span>
+                <h3 class="fw-bold mb-1">ઓનલાઇન ફોર્મ ઓટો-ફિલિંગ આસિસ્ટન્ટ</h3>
+                <p class="mb-0 text-light opacity-90" style="max-width: 650px;">
+                    ઉમેદવારની વિગતો અને ડોક્યુમેન્ટ્સ (ફોટો, સહી) એકવાર અપલોડ કરો. ત્યારબાદ કોઈપણ લિંક આપીને ૧-ક્લિકમાં ફોર્મ ભરાઈ જશે!
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <button onclick="loadSampleProfile()" class="btn btn-light fw-bold text-primary shadow-sm rounded-pill px-4">
+                    <i class="bi bi-magic me-1"></i> ડેમો પ્રોફાઇલ લોડ કરો
+                </button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="fill-tab" data-bs-toggle="tab" data-bs-target="#fill-pane" type="button">
+                    <i class="bi bi-play-circle-fill me-2 text-primary"></i>ફોર્મ ફિલિંગ હબ (Form Filling Hub)
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="profiles-tab" data-bs-toggle="tab" data-bs-target="#profiles-pane" type="button">
+                    <i class="bi bi-people-fill me-2 text-primary"></i>ઉમેદવાર પ્રોફાઇલ્સ (Candidate Vault)
+                    <span id="profileCountBadge" class="badge bg-secondary ms-1">0</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- TAB 1: FORM FILLING HUB -->
+            <div class="tab-pane fade show active" id="fill-pane">
+                <div class="row g-4">
+                    <!-- Left: Form Controls -->
+                    <div class="col-lg-6">
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="bi bi-send-check text-primary me-2"></i> ફોર્મ ઓટો-ફિલ શરૂ કરો
+                            </h5>
+
+                            <!-- Step 1: Candidate Selection -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">૧. ઉમેદવાર પસંદ કરો (Select Candidate) <span class="text-danger">*</span></label>
+                                <select id="fillCandidateSelect" class="form-select form-select-lg">
+                                    <option value="">-- ઉમેદવાર પસંદ કરો --</option>
+                                </select>
+                                <div id="selectedCandidatePreview" class="mt-2 p-2 bg-light rounded d-none align-items-center gap-3">
+                                    <div id="previewAvatar" class="avatar-box">
+                                        <i class="bi bi-person fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div id="previewName" class="fw-bold"></div>
+                                        <small id="previewInfo" class="text-muted"></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Form URL -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">૨. ફોર્મની વેબસાઇટ લિંક (Target Form URL) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="url" id="targetUrlInput" class="form-control" placeholder="https://..." value="http://127.0.0.1:5000/demo-form">
+                                </div>
+                                <div class="d-flex gap-2 mt-2 flex-wrap align-items-center">
+                                    <button onclick="setTargetUrl('http://127.0.0.1:5000/demo-form')" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                        <i class="bi bi-lightning-charge-fill text-warning me-1"></i>ટેસ્ટ ફોર્મ લિંક
+                                    </button>
+                                    <button onclick="openTargetInNewTab()" class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>આ બ્રાઉઝરમાં ફોર્મ જુઓ
+                                    </button>
+                                </div>
+                                <small class="text-muted d-block mt-1">Google Forms, સરકારી પોર્ટલ, કોલેજ ફોર્મ કે કોઈ પણ ફોર્મ લિંક અહીં પેસ્ટ કરી શકો છો.</small>
+                            </div>
+
+                            <!-- Step 3: Browser Selection -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">૩. કયા બ્રાઉઝરમાં ફોર્મ ભરવું છે? (Browser)</label>
+                                <div class="d-flex gap-3 mt-1 flex-wrap">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="browserRadio" id="b_chrome" value="chrome" checked>
+                                        <label class="form-check-label fw-semibold text-success" for="b_chrome">
+                                            <i class="bi bi-browser-chrome text-danger me-1"></i>Google Chrome (ભલામણ કરેલ - ૧૦૦% અલગ વિન્ડોમાં ખુલશે)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="browserRadio" id="b_edge" value="msedge">
+                                        <label class="form-check-label fw-semibold" for="b_edge">
+                                            <i class="bi bi-browser-edge text-primary me-1"></i>Microsoft Edge
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="mt-4">
+                                <button id="startFillBtn" onclick="executeFormFill()" class="btn btn-fill w-100 fs-5 d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-cpu-fill"></i>
+                                    <span>ઓટોમેટિક ફોર્મ ભરો (Start Auto-Fill)</span>
+                                </button>
+                                <small class="text-muted d-block text-center mt-2">
+                                    <i class="bi bi-shield-check text-success me-1"></i>
+                                    પસંદ કરેલ બ્રાઉઝર તમારી સામે ખુલશે અને તમામ ફીલ્ડ + ડોક્યુમેન્ટ્સ જાતે ભરી દેશે.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Live Terminal Logs -->
+                    <div class="col-lg-6">
+                        <div class="card card-custom p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0 d-flex align-items-center">
+                                    <i class="bi bi-terminal-fill text-dark me-2"></i> લાઈવ ઓપરેશન લોગ્સ (Live Logs)
+                                </h5>
+                                <button onclick="clearConsole()" class="btn btn-sm btn-outline-secondary py-0">સાફ કરો</button>
+                            </div>
+
+                            <div id="consoleLog" class="console-box">
+                                <div class="console-line text-muted">[System Ready] કૃપા કરીને ઉમેદવાર પસંદ કરો અને ફોર્મ લિંક આપીને બટન દબાવો...</div>
+                            </div>
+
+                            <!-- Status Box -->
+                            <div id="statusAlert" class="alert alert-secondary mt-3 mb-0 py-2 d-flex align-items-center gap-2">
+                                <div class="spinner-border spinner-border-sm text-primary d-none" id="logSpinner"></div>
+                                <span id="statusMessage">તૈયાર છે (Ready to Fill)</span>
+                            </div>
+
+                            <!-- Screenshot Preview Card -->
+                            <div id="screenshotPreviewCard" class="mt-3 p-3 bg-white rounded border d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-camera me-1"></i>ભરાયેલ ફોર્મનો લાઈવ પ્રિવ્યુ (Form Screenshot)</h6>
+                                    <a id="screenshotDownloadBtn" href="#" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">મોટી સાઇઝમાં જુઓ</a>
+                                </div>
+                                <div style="max-height: 380px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+                                    <img id="screenshotImg" src="" style="width: 100%; object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: CANDIDATE PROFILES VAULT -->
+            <div class="tab-pane fade" id="profiles-pane">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">સાચવેલ ઉમેદવારોની યાદી (Saved Candidates)</h5>
+                    <button onclick="openNewProfileModal()" class="btn btn-primary fw-semibold rounded-pill">
+                        <i class="bi bi-plus-lg me-1"></i> નવો ઉમેદવાર ઉમેરો
+                    </button>
+                </div>
+
+                <div id="profilesList" class="row g-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT CANDIDATE PROFILE -->
+    <div class="modal fade" id="profileModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="profileModalTitle">
+                        <i class="bi bi-person-lines-fill text-primary me-2"></i>ઉમેદવારની માહિતી અને ફાઇલો
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="profileForm" enctype="multipart/form-data">
+                        <input type="hidden" id="profileId" name="id">
+
+                        <!-- SECTION 1: PERSONAL INFO -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                            <i class="bi bi-person-circle me-1"></i> ૧. અંગત વિગતો (Personal Information)
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">પ્રથમ નામ (First Name) *</label>
+                                <input type="text" class="form-control" id="m_fname" name="first_name" required placeholder="ઉદા. રાજેશ">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">પિતા/પતિનું નામ (Middle/Father Name) *</label>
+                                <input type="text" class="form-control" id="m_mname" name="middle_name" required placeholder="ઉદા. રમેશભાઈ">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">અટક (Last Name / Surname) *</label>
+                                <input type="text" class="form-control" id="m_lname" name="last_name" required placeholder="ઉદા. પટેલ">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">જન્મ તારીખ (DOB) *</label>
+                                <input type="date" class="form-control" id="m_dob" name="dob" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">જાતિ (Gender) *</label>
+                                <select class="form-select" id="m_gender" name="gender" required>
+                                    <option value="Male">પુરુષ (Male)</option>
+                                    <option value="Female">સ્ત્રી (Female)</option>
+                                    <option value="Other">અન્ય (Other)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">સામાજિક કેટેગરી (Category) *</label>
+                                <select class="form-select" id="m_category" name="category" required>
+                                    <option value="General">જનરલ (General)</option>
+                                    <option value="OBC">ઓ.બી.સી / SEBC (OBC)</option>
+                                    <option value="SC">એસ.સી (SC)</option>
+                                    <option value="ST">એસ.ટી (ST)</option>
+                                    <option value="EWS">ઈ.ડબ્લ્યુ.એસ (EWS)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">લગ્ન સ્થિતિ (Marital Status)</label>
+                                <select class="form-select" id="m_marital" name="marital_status">
+                                    <option value="Single">અપરિણીત (Single / Unmarried)</option>
+                                    <option value="Married">પરિણીત (Married)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: CONTACT & ADDRESS -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                            <i class="bi bi-geo-alt-fill me-1"></i> ૨. સંપર્ક અને સરનામું (Contact & Address)
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">મોબાઈલ નંબર (Mobile Number) *</label>
+                                <input type="tel" class="form-control" id="m_mobile" name="mobile" required placeholder="9876543210">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">ઈમેઈલ (Email Address) *</label>
+                                <input type="email" class="form-control" id="m_email" name="email" required placeholder="rajesh@gmail.com">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">રહેઠાણનું પૂરું સરનામું (Full Address) *</label>
+                                <textarea class="form-control" id="m_address" name="address_line1" rows="2" placeholder="ઘર નં, સોસાયટી, શેરી"></textarea>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">ગામ / શહેર (City / Village) *</label>
+                                <input type="text" class="form-control" id="m_city" name="village_city" placeholder="અમદાવાદ">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">તાલુકો (Taluka)</label>
+                                <input type="text" class="form-control" id="m_taluka" name="taluka" placeholder="તાલુકો">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">જિલ્લો (District) *</label>
+                                <input type="text" class="form-control" id="m_district" name="district" placeholder="અમદાવાદ">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">રાજ્ય (State) *</label>
+                                <input type="text" class="form-control" id="m_state" name="state" value="Gujarat">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">પિનકોડ (Pincode) *</label>
+                                <input type="text" class="form-control" id="m_pincode" name="pincode" placeholder="380001">
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: IDENTITY & BANK -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                            <i class="bi bi-credit-card-2-front-fill me-1"></i> ૩. ઓળખ પુરાવા અને બેંક (Identity & Bank)
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">આધાર કાર્ડ નંબર (Aadhaar Number) *</label>
+                                <input type="text" class="form-control" id="m_aadhaar" name="aadhaar" placeholder="12 અંકનો આધાર">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">પાન કાર્ડ નંબર (PAN Number)</label>
+                                <input type="text" class="form-control" id="m_pan" name="pan" placeholder="ABCDE1234F">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">બેંકનું નામ (Bank Name)</label>
+                                <input type="text" class="form-control" id="m_bank" name="bank_name" placeholder="SBI / HDFC / BOB">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">બેંક ખાતા નંબર (Account Number)</label>
+                                <input type="text" class="form-control" id="m_acc" name="account_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">IFSC કોડ (IFSC Code)</label>
+                                <input type="text" class="form-control" id="m_ifsc" name="ifsc_code" placeholder="SBIN0001234">
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: EDUCATION -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                            <i class="bi bi-mortarboard-fill me-1"></i> ૪. શૈક્ષણિક લાયકાત અને ટ્રાયલ (Education & Trials)
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">ઉચ્ચતમ લાયકાત (Degree / Level)</label>
+                                <input type="text" class="form-control" id="m_qual" name="qualification" placeholder="Graduate / 10th / 12th">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">બોર્ડ / યુનિવર્સિટી (Board / University)</label>
+                                <input type="text" class="form-control" id="m_board" name="board_university" placeholder="GSEB / Gujarat Uni">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">પાસ કર્યા વર્ષ</label>
+                                <input type="text" class="form-control" id="m_pyear" name="passing_year" placeholder="2022">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">ટકાવારી (%)</label>
+                                <input type="text" class="form-control" id="m_percent" name="percentage" placeholder="78.50">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">ટ્રાયલ સંખ્યા</label>
+                                <select class="form-select" id="m_trials" name="trials_count">
+                                    <option value="1">૧ (1st Trial)</option>
+                                    <option value="2">૨ (2nd Trial)</option>
+                                    <option value="3">૩ (3rd Trial)</option>
+                                    <option value="4">૪ (4th Trial)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5: FILES & DOCUMENTS -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                            <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> ૫. ડોક્યુમેન્ટ અને ફાઇલો અપલોડ (Files & Uploads)
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">પાસપોર્ટ સાઇઝ ફોટો (Passport Photo)</label>
+                                <input type="file" class="form-control" name="file_photo" accept="image/*">
+                                <div id="existing_photo" class="small text-success mt-1"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">સહી (Specimen Signature)</label>
+                                <input type="file" class="form-control" name="file_signature" accept="image/*">
+                                <div id="existing_signature" class="small text-success mt-1"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">આધાર કાર્ડ (Aadhaar Card)</label>
+                                <input type="file" class="form-control" name="file_aadhaar_doc">
+                                <div id="existing_aadhaar_doc" class="small text-success mt-1"></div>
+                            </div>
+                        </div>
+
+                        <!-- MULTIPLE MARKSHEETS & TRIALS ACCORDION -->
+                        <div class="card border-primary border-opacity-25 mb-3 bg-light bg-opacity-50">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                    <h6 class="fw-bold text-dark mb-0">
+                                        <i class="bi bi-files text-primary me-2"></i>માર્કશીટો અને ટ્રાયલ ફાઇલો (Multiple Marksheets & Trials)
+                                    </h6>
+                                    <span class="badge bg-primary text-white">જો ૨ કે ૩ પ્રયત્ને પાસ થયા હોય તો અહીં તમામ માર્કશીટ જોડો</span>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">મુખ્ય પાસ માર્કશીટ (Final Passing Marksheet)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_marksheet">
+                                        <div id="existing_marksheet" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">પ્રથમ ટ્રાયલ માર્કશીટ (Trial 1 Marksheet)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_marksheet_trial1">
+                                        <div id="existing_marksheet_trial1" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">બીજી ટ્રાયલ માર્કશીટ (Trial 2 Marksheet)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_marksheet_trial2">
+                                        <div id="existing_marksheet_trial2" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">ટ્રાયલ / એટેમ્પ્ટ સર્ટિફિકેટ (Attempt Certificate)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_trial_cert">
+                                        <div id="existing_trial_cert" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">ધોરણ ૧૨ માર્કશીટ (12th HSC Marksheet)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_hsc_marksheet">
+                                        <div id="existing_hsc_marksheet" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small">ડિગ્રી / કોલેજ માર્કશીટ (Degree Marksheet)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_degree_marksheet">
+                                        <div id="existing_degree_marksheet" class="small text-success mt-1"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>કેટલાક સરકારી ફોર્મમાં "બધી માર્કશીટો ભેગી કરીને ૧ પીડીએફ" માંગવામાં આવે છે.
+                                    </small>
+                                    <button type="button" onclick="mergeMarksheetsAction()" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+                                        <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>બધી માર્કશીટો ભેગી કરીને ૧ PDF બનાવો
+                                    </button>
+                                </div>
+                                <div id="mergePdfResult" class="small mt-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- SCHOLARSHIP, ADMISSION & GOVT DOCUMENTS CARD -->
+                        <div class="card border-success border-opacity-25 mb-3 bg-light bg-opacity-50">
+                            <div class="card-body">
+                                <h6 class="fw-bold text-dark mb-3">
+                                    <i class="bi bi-folder-check text-success me-2"></i>સ્કોલરશીપ અને સરકારી યોજના ડોક્યુમેન્ટ્સ (Scholarship & Govt Documents)
+                                </h6>
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">રેશન કાર્ડ (Ration Card / કૂપન)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_ration_card">
+                                        <div id="existing_ration_card" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">કોલેજ ફી પહોંચ (Fee Receipt)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_fee_receipt">
+                                        <div id="existing_fee_receipt" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">બોનાફાઇડ / આઈડી કાર્ડ (Bonafide / ID Card)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_bonafide_id">
+                                        <div id="existing_bonafide_id" class="small text-success mt-1"></div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">જાતિનો દાખલો (Caste Certificate)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_caste_cert">
+                                        <div id="existing_caste_cert" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">આવકનો દાખલો (Income Certificate)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_income_cert">
+                                        <div id="existing_income_cert" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">શાળા છોડ્યાનું પ્રમાણપત્ર (LC / Leaving Cert)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_lc_doc">
+                                        <div id="existing_lc_doc" class="small text-success mt-1"></div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">બેંક પાસબુક (Bank Passbook)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_bank_passbook">
+                                        <div id="existing_bank_passbook" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">ગેપ / બ્રેક એફિડેવિટ (Break Affidavit)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_break_affidavit">
+                                        <div id="existing_break_affidavit" class="small text-success mt-1"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold small">રેઝ્યૂમે / બાયોડેટા (Resume / CV)</label>
+                                        <input type="file" class="form-control form-control-sm" name="file_resume">
+                                        <div id="existing_resume" class="small text-success mt-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">રદ કરો (Cancel)</button>
+                    <button type="button" onclick="saveProfile()" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-save me-1"></i> પ્રોફાઇલ સાચવો (Save Profile)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let profiles = [];
+        let modalInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            modalInstance = new bootstrap.Modal(document.getElementById('profileModal'));
+            loadProfiles();
+
+            document.getElementById('fillCandidateSelect').addEventListener('change', function() {
+                const id = this.value;
+                const p = profiles.find(x => x.id === id);
+                const preview = document.getElementById('selectedCandidatePreview');
+                if (p) {
+                    preview.classList.remove('d-none');
+                    preview.classList.add('d-flex');
+                    document.getElementById('previewName').innerText = `${p.first_name} ${p.middle_name || ''} ${p.last_name || ''}`;
+                    document.getElementById('previewInfo').innerText = `મોબાઈલ: ${p.mobile} | આધાર: ${p.aadhaar || 'N/A'}`;
+                    
+                    const avatar = document.getElementById('previewAvatar');
+                    if (p.files && p.files.photo) {
+                        avatar.innerHTML = `<img src="/api/files/${p.id}/photo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+                    } else {
+                        avatar.innerHTML = `<i class="bi bi-person fs-4"></i>`;
+                    }
+                } else {
+                    preview.classList.add('d-none');
+                    preview.classList.remove('d-flex');
+                }
+            });
+        });
+
+        async function loadProfiles() {
+            try {
+                const res = await fetch('/api/profiles');
+                profiles = await res.json();
+                renderProfiles();
+            } catch (err) {
+                console.error("Failed to load profiles", err);
+            }
+        }
+
+        function renderProfiles() {
+            const listEl = document.getElementById('profilesList');
+            const selectEl = document.getElementById('fillCandidateSelect');
+            document.getElementById('profileCountBadge').innerText = profiles.length;
+
+            // Update candidate dropdown
+            selectEl.innerHTML = '<option value="">-- ઉમેદવાર પસંદ કરો --</option>';
+            profiles.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = `${p.first_name} ${p.last_name} (${p.mobile})`;
+                selectEl.appendChild(opt);
+            });
+
+            // Update Vault Cards
+            if (profiles.length === 0) {
+                listEl.innerHTML = `
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
+                        કોઈ ઉમેદવાર મળ્યા નથી. "ડેમો પ્રોફાઇલ લોડ કરો" અથવા "નવો ઉમેદવાર ઉમેરો" પર ક્લિક કરો.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = profiles.map(p => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-custom p-3 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="avatar-box">
+                                    ${p.files && p.files.photo ? `<img src="/api/files/${p.id}/photo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : `<i class="bi bi-person fs-4"></i>`}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h6 class="fw-bold mb-0 text-truncate">${p.first_name} ${p.middle_name || ''} ${p.last_name}</h6>
+                                    <span class="candidate-badge">${p.gender} | ${p.category}</span>
+                                </div>
+                            </div>
+
+                            <div class="small text-secondary mb-2">
+                                <div><i class="bi bi-telephone me-1"></i> ${p.mobile}</div>
+                                <div><i class="bi bi-envelope me-1"></i> ${p.email}</div>
+                                <div><i class="bi bi-geo-alt me-1"></i> ${p.village_city || ''}, ${p.district || ''}</div>
+                                <div><i class="bi bi-card-heading me-1"></i> આધાર: ${p.aadhaar || 'N/A'}</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
+                            <button onclick="useCandidateForFill('${p.id}')" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+                                <i class="bi bi-arrow-right-circle me-1"></i> ફોર્મ ભરો
+                            </button>
+                            <div class="d-flex gap-1">
+                                <button onclick="editProfile('${p.id}')" class="btn btn-light btn-sm text-secondary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button onclick="deleteProfile('${p.id}')" class="btn btn-light btn-sm text-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setTargetUrl(url) {
+            document.getElementById('targetUrlInput').value = url;
+        }
+
+        function openTargetInNewTab() {
+            const url = document.getElementById('targetUrlInput').value.trim();
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        function useCandidateForFill(id) {
+            const selectEl = document.getElementById('fillCandidateSelect');
+            selectEl.value = id;
+            selectEl.dispatchEvent(new Event('change'));
+            // switch to fill tab
+            const tabBtn = document.getElementById('fill-tab');
+            bootstrap.Tab.getInstance(tabBtn)?.show() || new bootstrap.Tab(tabBtn).show();
+        }
+
+        function logConsole(msg, type = 'info') {
+            const box = document.getElementById('consoleLog');
+            const d = document.createElement('div');
+            d.className = 'console-line';
+            if (type === 'success') d.style.color = '#34d399';
+            else if (type === 'error') d.style.color = '#f87171';
+            else if (type === 'warn') d.style.color = '#fbbf24';
+            else d.style.color = '#38bdf8';
+
+            const time = new Date().toLocaleTimeString();
+            d.innerText = `[${time}] ${msg}`;
+            box.appendChild(d);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('consoleLog').innerHTML = '';
+        }
+
+        async function executeFormFill() {
+            const candidateId = document.getElementById('fillCandidateSelect').value;
+            const targetUrl = document.getElementById('targetUrlInput').value.trim();
+            const browserChoice = document.querySelector('input[name="browserRadio"]:checked')?.value || 'msedge';
+
+            if (!candidateId) {
+                alert('કૃપા કરીને પહેલા ઉમેદવાર પસંદ કરો!');
+                return;
+            }
+            if (!targetUrl) {
+                alert('કૃપા કરીને ફોર્મની વેબસાઇટ લિંક દાખલ કરો!');
+                return;
+            }
+
+            const btn = document.getElementById('startFillBtn');
+            const spinner = document.getElementById('logSpinner');
+            const statusMsg = document.getElementById('statusMessage');
+
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            const bName = browserChoice === 'msedge' ? 'Microsoft Edge' : 'Google Chrome';
+            statusMsg.innerText = `${bName} ઓટોમેશન શરૂ થઈ રહ્યું છે...`;
+
+            logConsole(`🚀 શરૂ કરી રહ્યા છીએ: ${targetUrl}`);
+            logConsole(`🌐 બ્રાઉઝર: ${bName}`);
+            logConsole(`👤 ઉમેદવાર ID: ${candidateId}`);
+
+            try {
+                const res = await fetch('/api/fill', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        profile_id: candidateId,
+                        url: targetUrl,
+                        browser: browserChoice
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    logConsole(`✅ સફળતાપૂર્વક ${data.filled_count} ફીલ્ડ ભરાઈ ગયા છે!`, 'success');
+                    if (data.details) {
+                        data.details.forEach(det => logConsole(`   • ${det}`));
+                    }
+                    logConsole(`💡 બ્રાઉઝર વિન્ડો ખુલ્લી છે. વિગતો ચકાસીને સબમિટ કરી શકો છો.`, 'warn');
+                    if (data.screenshot_url) {
+                        const card = document.getElementById('screenshotPreviewCard');
+                        const img = document.getElementById('screenshotImg');
+                        const btn = document.getElementById('screenshotDownloadBtn');
+                        card.classList.remove('d-none');
+                        img.src = data.screenshot_url;
+                        btn.href = data.screenshot_url;
+                        logConsole('📸 ભરાયેલ ફોર્મનો લાઈવ ફોટો નીચે પ્રિવ્યુમાં જોઈ શકો છો!', 'success');
+                    }
+                    statusMsg.innerText = `સંપૂર્ણ! ${data.filled_count} ફીલ્ડ ભરાયા.`;
+                } else {
+                    logConsole(`❌ ભૂલ: ${data.error}`, 'error');
+                    statusMsg.innerText = 'પ્રક્રિયામાં ભૂલ આવી.';
+                }
+            } catch (err) {
+                logConsole(`❌ નેટવર્ક અથવા સર્વર એરર: ${err.message}`, 'error');
+                statusMsg.innerText = 'કનેક્શન એરર.';
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        }
+
+        function clearFileIndicators() {
+            const keys = [
+                'photo', 'signature', 'aadhaar_doc', 'pan_doc', 'ration_card',
+                'fee_receipt', 'bonafide_id', 'break_affidavit', 'caste_cert',
+                'income_cert', 'lc_doc', 'bank_passbook', 'marksheet',
+                'marksheet_trial1', 'marksheet_trial2', 'trial_cert',
+                'hsc_marksheet', 'degree_marksheet', 'resume'
+            ];
+            keys.forEach(k => {
+                const el = document.getElementById(`existing_${k}`);
+                if (el) el.innerText = '';
+            });
+            const res = document.getElementById('mergePdfResult');
+            if (res) res.innerText = '';
+        }
+
+        function openNewProfileModal() {
+            document.getElementById('profileForm').reset();
+            document.getElementById('profileId').value = '';
+            document.getElementById('profileModalTitle').innerText = 'નવો ઉમેદવાર ઉમેરો (Add Candidate)';
+            clearFileIndicators();
+            modalInstance.show();
+        }
+
+        function editProfile(id) {
+            const p = profiles.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('profileForm').reset();
+            document.getElementById('profileId').value = p.id;
+            document.getElementById('profileModalTitle').innerText = 'ઉમેદવાર સંપાદિત કરો (Edit Candidate)';
+            clearFileIndicators();
+
+            // Fill inputs
+            document.getElementById('m_fname').value = p.first_name || '';
+            document.getElementById('m_mname').value = p.middle_name || '';
+            document.getElementById('m_lname').value = p.last_name || '';
+            document.getElementById('m_dob').value = p.dob || '';
+            document.getElementById('m_gender').value = p.gender || 'Male';
+            document.getElementById('m_category').value = p.category || 'General';
+            document.getElementById('m_marital').value = p.marital_status || 'Single';
+            document.getElementById('m_mobile').value = p.mobile || '';
+            document.getElementById('m_email').value = p.email || '';
+            document.getElementById('m_address').value = p.address_line1 || '';
+            document.getElementById('m_city').value = p.village_city || '';
+            document.getElementById('m_taluka').value = p.taluka || '';
+            document.getElementById('m_district').value = p.district || '';
+            document.getElementById('m_state').value = p.state || 'Gujarat';
+            document.getElementById('m_pincode').value = p.pincode || '';
+            document.getElementById('m_aadhaar').value = p.aadhaar || '';
+            document.getElementById('m_pan').value = p.pan || '';
+            document.getElementById('m_bank').value = p.bank_name || '';
+            document.getElementById('m_acc').value = p.account_number || '';
+            document.getElementById('m_ifsc').value = p.ifsc_code || '';
+            document.getElementById('m_qual').value = p.qualification || '';
+            document.getElementById('m_board').value = p.board_university || '';
+            document.getElementById('m_pyear').value = p.passing_year || '';
+            document.getElementById('m_percent').value = p.percentage || '';
+            if (document.getElementById('m_trials')) {
+                document.getElementById('m_trials').value = p.trials_count || '1';
+            }
+
+            // Show uploaded files status
+            if (p.files) {
+                const keys = [
+                    'photo', 'signature', 'aadhaar_doc', 'pan_doc', 'ration_card',
+                    'fee_receipt', 'bonafide_id', 'break_affidavit', 'caste_cert',
+                    'income_cert', 'lc_doc', 'bank_passbook', 'marksheet',
+                    'marksheet_trial1', 'marksheet_trial2', 'trial_cert',
+                    'hsc_marksheet', 'degree_marksheet', 'resume'
+                ];
+                keys.forEach(k => {
+                    if (p.files[k]) {
+                        const el = document.getElementById(`existing_${k}`);
+                        if (el) el.innerText = '✓ ફાઇલ પહેલેથી અપલોડ છે';
+                    }
+                });
+            }
+
+            modalInstance.show();
+        }
+
+        async function mergeMarksheetsAction() {
+            const profileId = document.getElementById('profileId').value;
+            const resEl = document.getElementById('mergePdfResult');
+            if (!profileId) {
+                alert('કૃપા કરીને પહેલા પ્રોફાઇલ સાચવો (Save કરો), પછી પીડીએફ બનાવો.');
+                return;
+            }
+
+            resEl.innerHTML = '<span class="text-primary"><span class="spinner-border spinner-border-sm"></span> પીડીએફ બની રહી છે...</span>';
+            try {
+                const res = await fetch(`/api/profiles/${profileId}/merge-marksheets`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    resEl.innerHTML = `<span class="text-success fw-bold">✓ સફળતાપૂર્વક ${data.count} માર્કશીટો ભેગી કરીને ૧ PDF બનાવી દેવામાં આવી છે!</span>`;
+                    await loadProfiles();
+                } else {
+                    resEl.innerHTML = `<span class="text-danger">ભૂલ: ${data.error}</span>`;
+                }
+            } catch (err) {
+                resEl.innerHTML = `<span class="text-danger">એરર: ${err.message}</span>`;
+            }
+        }
+
+        async function saveProfile() {
+            const form = document.getElementById('profileForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            try {
+                const res = await fetch('/api/profiles/save', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    modalInstance.hide();
+                    await loadProfiles();
+                    logConsole(`💾 પ્રોફાઇલ સાચવવામાં આવી: ${formData.get('first_name')} ${formData.get('last_name')}`);
+                } else {
+                    alert('ભૂલ: ' + data.error);
+                }
+            } catch (err) {
+                alert('પ્રોફાઇલ સાચવવામાં સમસ્યા: ' + err.message);
+            }
+        }
+
+        async function deleteProfile(id) {
+            if (!confirm('શું તમે ખરેખર આ ઉમેદવાર પ્રોફાઇલ ડિલીટ કરવા માંગો છો?')) return;
+            try {
+                const res = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
+                await loadProfiles();
+                logConsole('🗑️ પ્રોફાઇલ ડિલીટ કરવામાં આવી.');
+            } catch (err) {
+                alert('ડિલીટ કરવામાં ભૂલ.');
+            }
+        }
+
+        async function loadSampleProfile() {
+            try {
+                const res = await fetch('/api/profiles/load-sample', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    await loadProfiles();
+                    useCandidateForFill(data.profile_id);
+                    logConsole('✨ ડેમો ઉમેદવાર પ્રોફાઇલ (રાજેશ પટેલ) લોડ થઈ ગઈ છે! હવે "Start Auto-Fill" દબાવો.');
+                }
+            } catch (err) {
+                alert('ડેમો પ્રોફાઇલ લોડ કરવામાં ભૂલ');
+            }
+        }
+    </script>
+</body>
+</html>
