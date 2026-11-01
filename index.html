@@ -200,10 +200,10 @@
                                 <label class="form-label fw-bold">૨. ફોર્મની વેબસાઇટ લિંક (Target Form URL) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                                    <input type="url" id="targetUrlInput" class="form-control" placeholder="https://..." value="http://127.0.0.1:5000/demo-form">
+                                    <input type="url" id="targetUrlInput" class="form-control" placeholder="https://..." value="">
                                 </div>
                                 <div class="d-flex gap-2 mt-2 flex-wrap align-items-center">
-                                    <button onclick="setTargetUrl('http://127.0.0.1:5000/demo-form')" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                    <button onclick="setTargetUrl(window.location.origin + '/demo-form')" class="btn btn-outline-secondary btn-sm rounded-pill">
                                         <i class="bi bi-lightning-charge-fill text-warning me-1"></i>ટેસ્ટ ફોર્મ લિંક
                                     </button>
                                     <button onclick="openTargetInNewTab()" class="btn btn-outline-primary btn-sm rounded-pill">
@@ -614,6 +614,10 @@
         let modalInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            const urlInput = document.getElementById('targetUrlInput');
+            if (urlInput && !urlInput.value) {
+                urlInput.value = window.location.origin + '/demo-form';
+            }
             modalInstance = new bootstrap.Modal(document.getElementById('profileModal'));
             loadProfiles();
 
