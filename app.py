@@ -15,15 +15,26 @@ import logging
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_cors import CORS
 from PIL import Image, ImageDraw, ImageFont
+import jinja2
 
 from engine import FormFillerEngine
-
-app = Flask(__name__, template_folder="templates", static_folder="static")
-CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "data", "profiles.json")
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
+
+template_dir = os.path.join(BASE_DIR, "templates") if os.path.isdir(os.path.join(BASE_DIR, "templates")) else BASE_DIR
+app = Flask(__name__, template_folder=template_dir, static_folder="static")
+CORS(app)
+
+# Support templates both in templates/ folder and in root directory
+template_search_dirs = [
+    os.path.join(BASE_DIR, "templates"),
+    BASE_DIR
+]
+app.jinja_loader = jinja2.ChoiceLoader([
+    jinja2.FileSystemLoader(d) for d in template_search_dirs if os.path.exists(d)
+])
 
 os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
@@ -46,11 +57,27 @@ def save_profiles(profiles):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    try:
+        return render_template("index.html")
+    except Exception:
+        pass
+    for path in [os.path.join(BASE_DIR, "index.html"), os.path.join(BASE_DIR, "templates", "index.html")]:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read(), 200, {"Content-Type": "text/html; charset=utf-8"}
+    return "<h3>Error: index.html not found</h3>", 404
 
 @app.route("/demo-form")
 def demo_form():
-    return render_template("demo_portal.html")
+    try:
+        return render_template("demo_portal.html")
+    except Exception:
+        pass
+    for path in [os.path.join(BASE_DIR, "demo_portal.html"), os.path.join(BASE_DIR, "templates", "demo_portal.html")]:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read(), 200, {"Content-Type": "text/html; charset=utf-8"}
+    return "<h3>Error: demo_portal.html not found</h3>", 404
 
 @app.route("/api/profiles", methods=["GET"])
 def list_profiles():
